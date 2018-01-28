@@ -9,6 +9,6 @@ My goal is understand and training Shiny web applications developed with Rstudio
 - [x] Create a repository on github;
 - [ ] Create my first app;
 - [ ] Learn shiny.io;
-- [ ] Use ```runGitHub() ```
-- [ ] Explore webservices
+- [ ] Use ```runGitHub() ```;
+- [ ] Explore webservices.
 -----
