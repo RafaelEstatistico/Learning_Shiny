@@ -12,18 +12,19 @@ BNDES <- BNDES %>% mutate(firm = substr(CNPJ, 1, 8)) %>%
          group_by(Sector = `Setor CNAE`, UF, firm, 
                   Year = substr(BNDES$`Data da Contratação`,1,4)) %>% 
          summarise(freq  = n(),
-                   value = sum(`Valor Contratado  R$`)) %>%
+                   value = sum(`Valor Contratado  R$`, na.rm = T),
+                   mean_val = mean(`Valor Contratado  R$`, na.rm = T)) %>%
          filter(UF != "IE")
 
 # Poligons in geoJson -----------------------------------------------------
 BR <- "https://raw.githubusercontent.com/fititnt/gis-dataset-brasil/master/uf/geojson/uf.json"
 states <- geojsonio::geojson_read(BR, what = "sp")
 
+states@data$NOME_UF <- as.character(states@data$NOME_UF) 
+states@data$NOME_UF <- ifelse(states@data$NOME_UF == "DF", "Distrito Federal", 
+                              states@data$NOME_UF)
 # UFS ---------------------------------------------------------------------
 ufs <- states@data[c("UF_05", "GEOCODIGO", "NOME_UF", "REGIAO")]
-ufs[,3] <- as.character(ufs[,3])
-ufs[,3] <- ifelse(ufs[,3]=="DF", "Distrito Federal", ufs[,3])
-
 
 # Save workspace ----------------------------------------------------------
 rm(list = c("BR", "file", "url"))

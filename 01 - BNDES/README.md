@@ -7,8 +7,8 @@ from Brazilian Develop Bank database by operation
 
 ### Task List
 - [x] Cartogram;
-- [ ] Time Series;
-- [ ] Pie Chart;
+- [x] Time Series;
+- [x] Pie Chart;
 - [ ] Bar Chart with drilldown;
 - [ ] Datatables;
 - [ ] About and disclaimer.
