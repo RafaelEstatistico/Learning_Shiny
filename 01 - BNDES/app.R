@@ -9,9 +9,13 @@ library(plotly)                  # Interactive graphs
 library(highcharter)             # Chart wiht drilldown
 library(tidyr)                   # For Spread
 
+list.packages <- c("shiny", "shinydashboard", "leaflet", "DT", "dplyr", "rgdal", "shinythemes", "plotly",
+                      "highcharter", "tidyr")
+new.packages <- list.packages[!(list.packages %in% installed.packages()[,"Package"])]
+if(length(new.packages)) install.packages(new.packages)
 
-setwd("C:/Users/rafal/Google Drive/GitHub/Learning_Shiny/01 - BNDES")
-
+# setwd("C:/Users/rafal/Google Drive/GitHub/Learning_Shiny/01 - BNDES")
+setwd("C:/Users/b2657804/Documents/Meu Drive/GitHub/Learning_Shiny/01 - BNDES")
 
 ui <- fluidPage( theme = shinytheme("flatly"),
                  h1("Exploring Shiny - BNDES", 
@@ -110,25 +114,30 @@ ui <- fluidPage( theme = shinytheme("flatly"),
                                      
                             ),
                             
+
+# HighChart ---------------------------------------------------------------
+
                             
                             tabPanel("Bar Charts", icon = icon("bar-chart"),
-                                     
-                                     fluidRow(h5("Em Breve...."),
-                                              column(width = 12, offset = 0,
-                                                     box(width=NULL ,
-                                                         highchartOutput("highchart")
-                                                     )
+                                     fluidRow(
+                                       column(width = 6, offset = 0,
+                                              wellPanel(uiOutput("yearsel3")
+                                                        )
+                                              ),
+                                       column(width = 6, offset = 0,
+                                              wellPanel(
+                                              radioButtons("meas3", "Measure", inline = T, 
+                                                           c("Frequency" = "freq",
+                                                             "Total Value" = "value",
+                                                             "Mean Value" = "mean_val")) 
+                                                        )
+                                              ),
+                                       column(width = 12,
+                                              highchartOutput("highchart")
+                                              
                                               )
                                      ) ),
                             tabPanel("About", icon = icon("question-circle")
-                                     
-                                     # fluidRow(h5("Em Breve...."),
-                                     #          column(width = 12, offset = 0,
-                                     #                 box(width=NULL #,
-                                     #                     # highchartOutput("highchart")
-                                     #                 )
-                                     #          )
-                                     # )
                                      )
                             
                             
@@ -167,6 +176,11 @@ server <- function(input, output){
   output$yearsel2 <- renderUI({
     year <- c("All", sort(unique(BNDE$Year)))
     selectInput("Year2", "Year", choices = year, selected = year[1])
+  })
+  
+  output$yearsel3 <- renderUI({
+    year <- c("All", sort(unique(BNDE$Year)))
+    selectInput("Year3", "Year", choices = year, selected = year[1])
   })
   
   # CNAE subdivision button
@@ -382,33 +396,65 @@ server <- function(input, output){
   options = list(lengthMenu = c(5, 10, 27), pageLength = 5, searching = F) )
   )  
 
+
+  # Filter HighCHart --------------------------------------------------------
+  data_sel3 <- reactive({
+    validate(
+      need(input$meas3, " "),
+      need(input$Year3, " ")
+    )
+    BNDE1 <- BNDES %>% group_by(UF, Sector, Year) %>% 
+      summarise(freq  = sum(freq, na.rm = T),
+                value = sum(value, na.rm = T),
+                mean_val = mean(value, na.rm = T))
+    
+    datahc <-  merge(BNDE1, ufs, by.x = "UF", by.y = "UF_05") 
+    # Year Filter
+    if(input$Year3 !="All") {
+      datahc <- filter(datahc, Year == input$Year3)
+    }
+    datahc["meas3"] <- datahc[input$meas3][,1]
+    
+    datahc
+  })
+    
+  
   # HighChart - DrillDown ---------------------------------------------------
   output$highchart <- renderHighchart({
     
-    data <- merge(data[,1:2], ufs, by.x = "CO_UF", by.y = "GEOCODIGO")
+    datahc <- data_sel3()
     
-    
-    data.r <- data %>% select(-CO_UF, -NOME_UF) %>% rename(name = REGIAO) %>%
-      group_by(name) %>% summarise(y = round(sum(coef_exp, na.rm = T), 2)) %>%
+    # First Layer
+    data_1 <- datahc %>% select(REGIAO, meas3) %>% rename(name = REGIAO) %>% 
+      group_by(name) %>% summarise(y = round(sum(meas3, na.rm = T), 2)) %>%
       mutate(drilldown = name)
     
-    data.uf <- data %>% select(-CO_UF) %>% mutate(id = REGIAO, 
-                                                  y = round(coef_exp, 2),
-                                                  name = NOME_UF) %>%
-      select(id, name, y)
+    # Second Layer
+    data_2 <- datahc %>% select(REGIAO, NOME_UF, meas3) %>% group_by(id = REGIAO, name = NOME_UF) %>%
+      summarise(y = round(sum(meas3), 2))  %>% mutate(drilldown = name)
     
-    aa <- list()
+    dat_2 <- list()
     j = 1
-    for(i in unique(data.uf$id)){
-      aa[[j+1]] <-  list(id = i, data = list.parse2(data.uf[which(data.uf$id==i),-1]))
+    for(i in unique(data_2$id)){
+      dat_2[[j]] <-  list(id = i, data = list.parse3(data_2[which(data_2$id == i), -1]))
       j = j+1
     }
     
-    data.l <- list.parse3(data.r)
+    # Third Layer
+    data_3 <- datahc %>% select(REGIAO, NOME_UF, Sector, freq) %>% group_by(id = NOME_UF, name = Sector) %>%
+      summarise(y = round(sum(freq), 2))
     
+    dat_3 <- list()
+    j = 1
+    for(i in unique(data_3$id)){
+      dat_3[[j]] <-  list(id = i, data = list.parse2(data_3[which(data_3$id == i), -1]))
+      j = j+1
+    }
+    
+    # HighChart
     hc <- highchart() %>%
       hc_chart(type = "column") %>%
-      hc_title(text = "Brincando") %>%
+      hc_title(text = "Total ") %>%
       hc_xAxis(type = "category") %>%
       hc_legend(enabled = FALSE) %>%
       hc_plotOptions(
@@ -418,12 +464,12 @@ server <- function(input, output){
         )
       ) %>%
       hc_add_series(
-        name = "Coef. de Exporta.",
+        name = input$meas3,
         colorByPoint = TRUE,
-        data = data.l
+        data = data_1
       ) %>% 
       hc_drilldown(
-        series = aa
+        series =  c(dat_2, dat_3)
       )
     
     hc
