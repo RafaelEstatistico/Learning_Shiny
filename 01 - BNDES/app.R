@@ -15,7 +15,7 @@ new.packages <- list.packages[!(list.packages %in% installed.packages()[,"Packag
 if(length(new.packages)) install.packages(new.packages)
 
 # setwd("C:/Users/rafal/Google Drive/GitHub/Learning_Shiny/01 - BNDES")
-setwd("C:/Users/b2657804/Documents/Meu Drive/GitHub/Learning_Shiny/01 - BNDES")
+# setwd("C:/Users/b2657804/Documents/Meu Drive/GitHub/Learning_Shiny/01 - BNDES")
 
 ui <- fluidPage( theme = shinytheme("flatly"),
                  h1("Exploring Shiny - BNDES", 
