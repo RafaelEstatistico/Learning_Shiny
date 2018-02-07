@@ -9,13 +9,13 @@ library(plotly)                  # Interactive graphs
 library(highcharter)             # Chart wiht drilldown
 library(tidyr)                   # For Spread
 
-list.packages <- c("shiny", "shinydashboard", "leaflet", "DT", "dplyr", "rgdal", "shinythemes", "plotly",
-                      "highcharter", "tidyr")
-new.packages <- list.packages[!(list.packages %in% installed.packages()[,"Package"])]
-if(length(new.packages)) install.packages(new.packages)
+# list.packages <- c("shiny", "shinydashboard", "leaflet", "DT", "dplyr", "rgdal", "shinythemes", "plotly",
+#                       "highcharter", "tidyr", "rmarkdown", "htmltools")
+# new.packages <- list.packages[!(list.packages %in% installed.packages()[,"Package"])]
+# if(length(new.packages)) install.packages(new.packages)
 
 # setwd("C:/Users/rafal/Google Drive/GitHub/Learning_Shiny/01 - BNDES")
-setwd("C:/Users/b2657804/Documents/Meu Drive/GitHub/Learning_Shiny/01 - BNDES")
+# setwd("C:/Users/b2657804/Documents/Meu Drive/GitHub/Learning_Shiny/01 - BNDES")
 
 ui <- fluidPage( theme = shinytheme("flatly"),
                  h1("Exploring Shiny - BNDES", 
@@ -137,10 +137,28 @@ ui <- fluidPage( theme = shinytheme("flatly"),
                                               
                                               )
                                      ) ),
-                            tabPanel("About", icon = icon("question-circle")
+                            tabPanel("Report", icon = icon("newspaper-o"),
+                                     fluidRow(
+                                       column(width = 6,
+                                         wellPanel(
+                                           checkboxGroupInput("checkGroup", label = h4("Report Content"), 
+                                                              choices = list("Cartogram" = 1, "Time Series" = 2, 
+                                                                             "Pie Chart" = 3, "Bar Chart" = 4), 
+                                                              selected = 1:4, inline = F)
+                                         )
+                                       ),
+                                       column(width = 6,
+                                              wellPanel(offset = 2,
+                                                downloadButton('Report.html',"Generate Report",
+                                                               style="color: #fff; background-color: #337ab7; border-color: #2e6da4")
+                                                )
+                                       )
                                      )
-                            
-                            
+                                     ),
+
+                            tabPanel("About", icon = icon("question-circle")
+                            )
+
                  ),
                  
 # Incone ao final da barra -> mudar endereco de link             
@@ -475,6 +493,20 @@ server <- function(input, output){
     hc
     
   }) 
+  
+  output$Report.html <- downloadHandler(
+    filename = "Report.html",
+    content = function(file) {
+      withProgress(message = 'Making Report:', value = 0, {
+        src <- normalizePath('report.Rmd')
+        
+        file.copy(src, 'report.Rmd', overwrite = F)
+        
+        out <- rmarkdown::render('report.Rmd',html_document(),encoding = 'UTF-8')
+      })
+      file.rename(out, file)
+    }
+  )
   
 }
 

@@ -1,0 +1,139 @@
+---
+output: html_document
+---
+
+## Title
+
+
+```{r Cartogram, echo=FALSE, message=FALSE, warning=FALSE}
+      incProgress(1/4, detail = "Cartogram")
+if(1 %in% input$checkGroup){
+    measu <- sort(c("Frequency: ", "Value: R$"), decreasing = input$meas != "freq")
+    measu2 <- sort(c("", "<strong> Milions</strong>"), decreasing = input$meas != "freq")
+    
+    data <- data_sel()
+    
+    pal <- colorNumeric("Blues", data$meas)
+    labels <- sprintf(paste0("<strong>Estado: </strong>",
+                             data$NOME_UF,
+                             paste0("<br><strong>", measu[1], "</strong>"),
+                             data$meas, measu2[1])) %>% lapply(htmltools::HTML)
+    # map
+    m <- leaflet(data = data) %>% setView(-54, -16, zoom = 3) %>%
+      addTiles(options = providerTileOptions(minZoom = 3, maxZoom = 8)) %>%
+      addPolygons(data = states, weight = 2, opacity = 1,
+                  color = "white", fillColor = ~pal(data$meas),
+                  dashArray = "3", fillOpacity = 0.7,
+                  highlight = highlightOptions(
+                    weight = 5, color = "#666",
+                    dashArray = "", fillOpacity = 0.7,
+                    bringToFront = TRUE),
+                  label = labels,
+                  labelOptions = labelOptions(
+                    style = list("font-weight" = "normal", padding = "3px 8px"),
+                    textsize = "15px",
+                    direction = "auto")) %>%
+      addLegend("bottomright", pal = pal, values = ~data$meas, 
+                opacity = 0.7, title = NULL)
+    
+    m
+}
+```
+
+
+```{r Time_Series, echo=FALSE, message=FALSE, warning=FALSE}
+      incProgress(1/4, detail = "Time Series")
+if(2 %in% input$checkGroup){
+      data1 <- data_sel1()
+
+      p <- plot_ly(data1, x = ~Year, y =~`AGROPECUÁRIA E PESCA`,
+                   name = "Agropecu\u00E1ria e Pesca",
+                   type = 'scatter', mode = 'lines+markers') %>%
+        add_trace(y = ~`COMERCIO E SERVICOS`,
+                  name = "Com\u00E9rcio e Servi\u00E7os") %>%
+        add_trace(y = ~`INDUSTRIA DE TRANSFORMAÇÃO`,
+                  name = "Ind\u00FAstria de Transforma\u00E7\u00E3o") %>%
+        add_trace(y = ~`INDUSTRIA EXTRATIVA`,
+                  name = "Ind\u00FAstria Extrativa") %>%
+        layout( legend = list(orientation = 'h'), xaxis = list(title = ""),
+                yaxis = list(title = ""), hovermode = "compare")
+      p
+}
+
+```
+
+```{r Pie Chart, echo=FALSE, message=FALSE, warning=FALSE}
+      incProgress(1/4, detail = "Pie Chart")
+if(3 %in% input$checkGroup){
+
+      data2 <- data_sel2()
+    if (nrow(data2) > 0) {
+      p <- plot_ly(data2, labels = ~Sector, values = ~meas, type = 'pie') %>%
+        layout(showlegend = T)
+      p
+    }  else {
+      stop(safeError(paste(input$uf, 'n\u00E3o possui datas') )) }
+    
+
+}
+```
+
+```{r BAr Charts, echo=FALSE, message=FALSE, warning=FALSE}
+      incProgress(1/4, detail = "Bar Chart")
+if(4 %in% input$checkGroup){
+
+      datahc <- data_sel3()
+    
+    # First Layer
+    data_1 <- datahc %>% select(REGIAO, meas3) %>% rename(name = REGIAO) %>% 
+      group_by(name) %>% summarise(y = round(sum(meas3, na.rm = T), 2)) %>%
+      mutate(drilldown = name)
+    
+    # Second Layer
+    data_2 <- datahc %>% select(REGIAO, NOME_UF, meas3) %>% group_by(id = REGIAO, name = NOME_UF) %>%
+      summarise(y = round(sum(meas3), 2))  %>% mutate(drilldown = name)
+    
+    dat_2 <- list()
+    j = 1
+    for(i in unique(data_2$id)){
+      dat_2[[j]] <-  list(id = i, data = list.parse3(data_2[which(data_2$id == i), -1]))
+      j = j+1
+    }
+    
+    # Third Layer
+    data_3 <- datahc %>% select(REGIAO, NOME_UF, Sector, freq) %>% group_by(id = NOME_UF, name = Sector) %>%
+      summarise(y = round(sum(freq), 2))
+    
+    dat_3 <- list()
+    j = 1
+    for(i in unique(data_3$id)){
+      dat_3[[j]] <-  list(id = i, data = list.parse2(data_3[which(data_3$id == i), -1]))
+      j = j+1
+    }
+    
+    # HighChart
+    hc <- highchart() %>%
+      hc_chart(type = "column") %>%
+      hc_title(text = "Total ") %>%
+      hc_xAxis(type = "category") %>%
+      hc_legend(enabled = FALSE) %>%
+      hc_plotOptions(
+        series = list(
+          boderWidth = 0,
+          dataLabels = list(enabled = TRUE)
+        )
+      ) %>%
+      hc_add_series(
+        name = input$meas3,
+        colorByPoint = TRUE,
+        data = data_1
+      ) %>% 
+      hc_drilldown(
+        series =  c(dat_2, dat_3)
+      )
+    
+    hc
+
+}
+```
+
