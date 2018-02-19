@@ -1,0 +1,13 @@
+
+<h3 class="toc-ignore"><span style="color:#000099">**Year:** `r getRversion()` text</span></h3>
+
+aaaa
+`r print("all")`
+asdadss 
+asd
+ddd
+
+```{r}
+# summary(cars)
+```
+

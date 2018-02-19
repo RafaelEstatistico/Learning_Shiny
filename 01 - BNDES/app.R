@@ -2,8 +2,8 @@ library(shiny)
 library(shinydashboard)
 library(leaflet)                 # Cartograms
 library(DT)                      # Data Tables
-library(dplyr)
-library(rgdal)
+library(dplyr)                   # Data manipulation
+library(rgdal)                   # Provides bindings to the 'Geospatial' 
 library(shinythemes)             # Custumize Shiny 
 library(plotly)                  # Interactive graphs 
 library(highcharter)             # Chart wiht drilldown
@@ -156,22 +156,38 @@ ui <- fluidPage( theme = shinytheme("flatly"),
                                      )
                                      ),
 
-                            tabPanel("About", icon = icon("question-circle")
+                            tabPanel("About", icon = icon("question-circle"),
+                                     column(width = 11, offset = 1,
+                                            wellPanel(
+
+                                     
+HTML("
+<img src='Rafael.jpg'; width='110' height='120' style='padding: 5px; float: left'>
+<p><strong>Statistician</strong>
+<br>E-mail:
+<a href='mailto:anajulia.padula@gmail.com'>
+rafaelestatistico@gmail.com</a></p>
+<p>
+Graduated in Statistics at University of Brasília (2017). Undertaking a Master's 
+degree in Statistics in Finance and Quantitative Methods at University of Brasília. 
+Currently is a fellow researcher at the Institute for Applied Economic Research. 
+Has experience in classification and regression models, data manipulation of large 
+datasets and interactive interfaces (Shiny). Has interests in machine learning, 
+finance, statistical modeling and probability.
+</p>"
+)
+
+)
+)
                             )
 
                  ),
                  
-# Incone ao final da barra -> mudar endereco de link             
+
 HTML("<script>var parent = document.getElementsByClassName('navbar-nav'); parent[0].insertAdjacentHTML(
      'afterend', '<ul class=\"nav navbar-nav navbar-right\"><li class=\"\"><a href=\"https://linkedin.com/in/RafaelLimaMorais/\"><i class=\"fa fa-linkedin\" aria-hidden=\"true\"></i></a></li><li class=\"\"><a href=\"https://github.com/RafaelEstatistico/Learning_Shiny/\"><i class=\"fa fa-github\" aria-hidden=\"true\"></i></a></li></ul>' );</script>")
 
 
-#                   )
-                 # navbarMenu("More",
-                 #            tabPanel("Sub-Component A"),
-                 #            tabPanel("Sub-Component B"))
-                 
-                 
                  
                  )
 
@@ -499,11 +515,9 @@ server <- function(input, output){
     content = function(file) {
       withProgress(message = 'Making Report:', value = 0, {
         src <- normalizePath('report.Rmd')
-        
         file.copy(src, 'report.Rmd', overwrite = F)
-        
-        out <- rmarkdown::render('report.Rmd',html_document(),encoding = 'UTF-8')
-      })
+        out <- rmarkdown::render('report.Rmd',encoding = 'UTF-8')
+      })       
       file.rename(out, file)
     }
   )

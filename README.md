@@ -13,12 +13,4 @@ shiny::runGitHub(repo = "Learning_Shiny", username = "RafaelEstatistico",
                  subdir = "01 - BNDES")
 ```
 
----
-### Task List
-- [x] Create a repository on github;
-- [x] Create my first app;
-- [X] Create my first app;
-- [ ] Learn shiny.io;
-- [x] Use ```runGitHub() ```;
-- [ ] Explore webservices.
 -----

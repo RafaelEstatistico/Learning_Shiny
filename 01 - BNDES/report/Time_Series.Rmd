@@ -1,0 +1,34 @@
+
+--- 
+
+## **Time Series**
+
++ <h3 class="toc-ignore"><span style="color:#000099">**Unidade Federativa: **</span> `r input$uf1`</h3>
+
++ <h3 class="toc-ignore"><span style="color:#000099">**Measure: **</span> `r lab_TS_M`</h3>
+
+<div class="row">
+<div class="col-sm-12">
+```{r Time_Series}
+# Bar Progress
+incProgress(1/n, detail = "Time Series")
+
+data1 <- data_sel1()
+
+p <- plot_ly(data1, x = ~Year, y =~`AGROPECUÁRIA E PESCA`, 
+             name = "Agropecu\u00E1ria e Pesca",
+             type = 'scatter', mode = 'lines+markers') %>%
+add_trace(y = ~`COMERCIO E SERVICOS`, 
+          name = "Com\u00E9rcio e Servi\u00E7os") %>%
+add_trace(y = ~`INDUSTRIA DE TRANSFORMAÇÃO`, 
+          name = "Ind\u00FAstria de Transforma\u00E7\u00E3o") %>%
+add_trace(y = ~`INDUSTRIA EXTRATIVA`, 
+          name = "Ind\u00FAstria Extrativa") %>%
+layout( legend = list(orientation = 'h'), xaxis = list(title = ""),
+        yaxis = list(title = ""), hovermode = "compare")
+p
+
+```
+</div>
+</div>
+

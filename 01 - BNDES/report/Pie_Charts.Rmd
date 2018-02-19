@@ -1,0 +1,28 @@
+
+---
+
+## **Pie Chart**
+
++ <h3 class="toc-ignore"><span style="color:#000099">**Year: **</span> `r lab_Pie_Y`</h3>
+
++ <h3 class="toc-ignore"><span style="color:#000099">**CNAE subdivision: **</span> `r input$uf1`</h3>
+
++ <h3 class="toc-ignore"><span style="color:#000099">**Measure: **</span> `r lab_Pie_M`</h3>
+
+<div class="row">
+<div class="col-sm-12">
+```{r Pie Chart}
+incProgress(1/n, detail = "Pie Chart")
+
+data2 <- data_sel2()
+if (nrow(data2) > 0) {
+  p <- plot_ly(data2, labels = ~Sector, values = ~meas, type = 'pie') %>%
+    layout(showlegend = T)
+  p
+}  else {
+    stop(safeError(paste(input$uf1, 'without enough data') )) }
+
+```
+</div>
+</div>
+

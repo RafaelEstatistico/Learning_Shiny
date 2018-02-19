@@ -1,0 +1,68 @@
+
+---
+
+## **Bar Charts**
+
++ <h3 class="toc-ignore"><span style="color:#000099">**Year: **</span> `r lab_Bar_Y`</h3>
+
++ <h3 class="toc-ignore"><span style="color:#000099">**Measure: **</span> `r lab_Bar_M`</h3>
+
+<div class="row">
+<div class="col-sm-12">
+```{r BAr Charts, echo=FALSE, message=FALSE, warning=FALSE}
+
+datahc <- data_sel3()
+
+# First Layer
+data_1 <- datahc %>% select(REGIAO, meas3) %>% rename(name = REGIAO) %>%
+  group_by(name) %>% summarise(y = round(sum(meas3, na.rm = T), 2)) %>%
+  mutate(drilldown = name)
+
+# Second Layer
+data_2 <- datahc %>% select(REGIAO, NOME_UF, meas3) %>% group_by(id = REGIAO, name = NOME_UF) %>%
+  summarise(y = round(sum(meas3), 2))  %>% mutate(drilldown = name)
+
+dat_2 <- list()
+j = 1
+for(i in unique(data_2$id)){
+  dat_2[[j]] <-  list(id = i, data = list.parse3(data_2[which(data_2$id == i), -1]))
+  j = j+1
+  }
+
+# Third Layer
+data_3 <- datahc %>% select(REGIAO, NOME_UF, Sector, freq) %>% group_by(id = NOME_UF, name = Sector) %>%
+  summarise(y = round(sum(freq), 2))
+
+dat_3 <- list()
+j = 1
+for(i in unique(data_3$id)){
+  dat_3[[j]] <-  list(id = i, data = list.parse2(data_3[which(data_3$id == i), -1]))
+  j = j+1
+  }
+
+# HighChart
+hc <- highchart() %>%
+  hc_chart(type = "column") %>%
+  hc_title(text = "Total ") %>%
+  hc_xAxis(type = "category") %>%
+  hc_legend(enabled = FALSE) %>%
+  hc_plotOptions(
+    series = list(
+      boderWidth = 0,
+      dataLabels = list(enabled = TRUE)
+      )
+    ) %>%
+  hc_add_series(
+    name = input$meas3,
+    colorByPoint = TRUE,
+    data = data_1
+    ) %>%
+  hc_drilldown(
+    series =  c(dat_2, dat_3)
+    )
+
+hc
+
+```
+</div>
+</div>

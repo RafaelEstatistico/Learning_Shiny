@@ -21,7 +21,4 @@ if(length(new.packages)) install.packages(new.packages)
 - [x] Bar Chart with drilldown;
 - [x] Datatables;
 - [x] Report in html;
-- [ ] About and disclaimer.
-- [X] Bar Chart with drilldown;
-- [X] Datatables;
 -----
