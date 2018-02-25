@@ -2,7 +2,7 @@
 ===
 
 Shiny study based on [open data](https://www.bndes.gov.br/wps/portal/site/home/transparencia/centraldedownloads) 
-from Brazilian Develop Bank database by operation
+from Brazilian Develop Bank (BNDES). Database: Operations contracted in direct and indirect non-automatic form.
 
 ## Libraries Needed
 For check and install all packages used you can run the script bellow:
@@ -14,11 +14,12 @@ new.packages <- list.packages[!(list.packages %in% installed.packages()[,"Packag
 if(length(new.packages)) install.packages(new.packages)
 ```
 
-### Task List
-- [x] Cartogram;
+### Results:
+- [x] Cartograms;
 - [x] Time Series;
-- [x] Pie Chart;
-- [x] Bar Chart with drilldown;
+- [x] Pie Charts;
+- [x] Bar Charts with drilldown;
 - [x] Datatables;
-- [x] Report in html;
+- [x] Report in html.
+
 -----

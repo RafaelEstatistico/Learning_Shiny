@@ -153,7 +153,8 @@ ui <- fluidPage( theme = shinytheme("flatly"),
                                                                style="color: #fff; background-color: #337ab7; border-color: #2e6da4")
                                                 )
                                        )
-                                     )
+                                     ),
+h5(span(style="color:red", "Note: for each selected chart choose the set considered in its respective tab."))
                                      ),
 
                             tabPanel("About", icon = icon("question-circle"),
