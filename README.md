@@ -14,4 +14,13 @@ shiny::runGitHub(repo = "Learning_Shiny", username = "RafaelEstatistico",
 ```
 **Note: please check if all packages are installed and if R is in a recent version**
 
+
+## Shinyapps.io
+
+The shiny apps are also hosted on Shinyapps.io which allows online execution, that is, without the need to run locally. 
+Following the online applications's link:
+
++ [01 - BNDES](https://rafa-est.shinyapps.io/01-BNDES/)
+
+
 -----
