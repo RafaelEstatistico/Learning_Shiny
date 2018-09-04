@@ -1,20 +1,28 @@
+rm(list = ls())
 # Pre processing to create data and poligons of Brazil
-
-# Download and prepare BNDES data  ----------------------------------------
-url <- "https://www.bndes.gov.br/wps/wcm/connect/site/f14610e3-b3f9-41f8-92b5-f8ec02f41ca4/BASE_CONTRATA%C3%87%C3%95ES_VSITE+-+20171228.xlsx?MOD=AJPERES&amp;CACHEID=ROOTWORKSPACE.Z18_7QGCHA41LORVA0AHO1SIO51085-f14610e3-b3f9-41f8-92b5-f8ec02f41ca4-lMrQW39"
-file <- "./data/BNDES.xlsx"
-curl::curl_download(url, file)
-BNDES <- readxl::read_excel(file, skip = 3)
-
-
+library(readxl)
 library(dplyr)
-BNDES <- BNDES %>% mutate(firm = substr(CNPJ, 1, 8)) %>%
-         group_by(Sector = `Setor CNAE`, UF, firm, 
-                  Year = substr(BNDES$`Data da Contratação`,1,4)) %>% 
-         summarise(freq  = n(),
-                   value = sum(`Valor Contratado  R$`, na.rm = T),
-                   mean_val = mean(`Valor Contratado  R$`, na.rm = T)) %>%
-         filter(UF != "IE")
+
+# BNDES matched data -----------------------------------------------------
+BNDES <- read_excel("01 - BNDES/data/BNDES_DATA.xlsx")
+
+# Inflator
+IPCA <- read_excel("01 - BNDES/data/Deflator_IPCA.xls")
+IPCA <- IPCA %>% select(Year = ANO, tx = TAXA)
+
+BNDES <- BNDES %>%
+  rename(Year = ano, Sector = setor) %>%
+  mutate(UF = as.character(uf)) %>% 
+  group_by(Year, diretox, Sector, grupo_n, UF) %>% 
+  summarise(freq = n(),
+            pot = sum(pot),
+            msal = sum(msal),
+            vdir = sum(vdir))
+
+BNDES <- left_join(BNDES, IPCA, by = "Year") %>% 
+  mutate(msal = msal*tx,
+         vdir = vdir*tx) %>% 
+  select(-tx)
 
 # Poligons in geoJson -----------------------------------------------------
 BR <- "https://raw.githubusercontent.com/fititnt/gis-dataset-brasil/master/uf/geojson/uf.json"
@@ -26,6 +34,9 @@ states@data$NOME_UF <- ifelse(states@data$NOME_UF == "DF", "Distrito Federal",
 # UFS ---------------------------------------------------------------------
 ufs <- states@data[c("UF_05", "GEOCODIGO", "NOME_UF", "REGIAO")]
 
+
 # Save workspace ----------------------------------------------------------
-rm(list = c("BR", "file", "url"))
-save.image("./data/Shiny_Data.RData")
+rm(list = c("IPCA", "BR"))
+save.image("01 - BNDES/data/Shiny_Data_.RData")
+
+
