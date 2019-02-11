@@ -25,7 +25,7 @@ if(length(new.packages)) install.packages(new.packages)
 Se você tiver os pacotes pode tentar rodar esse Shiny usando o comando:
 ```
 shiny::runGitHub(repo = "Learning_Shiny", username = "RafaelEstatistico", 
-                 subdir = "tutorial")
+                 subdir = "tutoriais")
 ```
 
 ## Dados e Programas
