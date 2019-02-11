@@ -15,10 +15,9 @@ Aqui eu pretendo deixar mais claro colocando um passo-a-passo de como criar um S
 
 Para checar se tem tudo instalado você pode rodar 
 ´´´
-list.packages <- c("shiny", "shinydashboard", "leaflet", "DT", "dplyr", "rgdal", "shinythemes", "tidyr","rmapshaper")
+list.packages <- c("shiny", "shinydashboard", "leaflet", "DT", "dplyr", "rgdal", "shinythemes", "tidyr", "geojsonio")
 new.packages <- list.packages[!(list.packages %in% installed.packages()[,"Package"])]
 if(length(new.packages)) install.packages(new.packages)
-
 ´´´
 
 ===
