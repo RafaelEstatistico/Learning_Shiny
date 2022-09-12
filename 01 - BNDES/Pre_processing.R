@@ -31,6 +31,9 @@ states <- geojsonio::geojson_read(BR, what = "sp")
 states@data$NOME_UF <- as.character(states@data$NOME_UF) 
 states@data$NOME_UF <- ifelse(states@data$NOME_UF == "DF", "Distrito Federal", 
                               states@data$NOME_UF)
+
+states@data$NOME_UF = iconv(states@data$NOME_UF, "latin1", "UTF-8")
+
 # UFS ---------------------------------------------------------------------
 ufs <- states@data[c("UF_05", "GEOCODIGO", "NOME_UF", "REGIAO")]
 

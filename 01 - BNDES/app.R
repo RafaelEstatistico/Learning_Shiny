@@ -61,7 +61,7 @@ h5(strong(p(style="color:black",
                                        )
                                      ),
 # Tab 02 - Time Series ----------------------------------------------------
-tabPanel("Time Series", icon = icon("line-chart"),
+tabPanel("Time Series", icon = icon("chart-line"),
          fluidRow(
            column(width = 4, offset = 0,
                   wellPanel(width=NULL, 
@@ -91,7 +91,7 @@ tabPanel("Time Series", icon = icon("line-chart"),
          )
 ),
 # Tab 03 - Pie Chart ------------------------------------------------------
-tabPanel("Pie Chart", icon = icon("pie-chart"),
+tabPanel("Pie Chart", icon = icon("chart-pie"),
          
          fluidRow(
            column(width = 4, offset = 0,
@@ -127,7 +127,7 @@ tabPanel("Pie Chart", icon = icon("pie-chart"),
 # HighChart ---------------------------------------------------------------
 
 
-tabPanel("Bar Charts", icon = icon("bar-chart"),
+tabPanel("Bar Charts", icon = icon("chart-column"),
          fluidRow(
            column(width = 4, offset = 0,
                   wellPanel(uiOutput("yearsel3")
@@ -154,9 +154,9 @@ tabPanel("Bar Charts", icon = icon("bar-chart"),
                   
            )
          ) ,
+# <i class="fa-regular fa-circle-question"></i>
 
-
-tabPanel("About", icon = icon("question-circle"),
+tabPanel("About", icon = icon("circle-question"),
          column(width = 11, offset = 1,
                 wellPanel(
                   
@@ -194,7 +194,7 @@ HTML("<script>var parent = document.getElementsByClassName('navbar-nav'); parent
 
 
 server <- function(input, output){
-  options(warn =-1) # No warnings!
+  # options(warn =-1) # No warnings!
   
   load("data/Shiny_Data_.RData")
   BNDE <- BNDES %>% group_by(UF, diretox, grupo_n, Year) %>% 
@@ -295,15 +295,16 @@ server <- function(input, output){
     data <- data_sel()[[1]]
     
     pal <- colorNumeric("Blues", data$meas)
-    labels <- sprintf(paste0("<strong>State: </strong>",
+    
+    labels <- sprintf(paste0("State: </strong>",
                              data$NOME_UF,
                              paste0("<br><strong>", measu[1],"</strong>"),
-                             data$freq, 
+                             data$freq,
                              paste0("<br><strong>", measu[2],"</strong>"),
-                             data$pot, 
+                             data$pot,
                              paste0("<br><strong>", measu[3],"</strong>"),
                              data$rend_med)) %>% 
-                        lapply(htmltools::HTML)
+      lapply(htmltools::HTML)
         # map
     m <- leaflet(data = data) %>% setView(-54, -16, zoom = 3) %>%
       addTiles(options = providerTileOptions(minZoom = 3, maxZoom = 8)) %>%
@@ -531,7 +532,7 @@ server <- function(input, output){
     dat_2 <- list()
     j = 1
     for(i in unique(data_2$id)){
-      dat_2[[j]] <- list(id = i, data=list.parse3(data_2[which(data_2$id == i), -1]))
+      dat_2[[j]] <- list(id = i, data=list_parse(data_2[which(data_2$id == i), -1]))
       j = j+1
     }
     
@@ -549,7 +550,7 @@ server <- function(input, output){
     dat_3 <- list()
     j = 1
     for(i in unique(data_3$id)){
-      dat_3[[j]] <- list(id = i, data = list.parse2(data_3[which(data_3$id == i), -1]))
+      dat_3[[j]] <- list(id = i, data = list_parse2(data_3[which(data_3$id == i), -1]))
       j = j+1
     }
     
